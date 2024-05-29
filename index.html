@@ -7,17 +7,34 @@
             background-color: purple;
             color: white;
             font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
             padding: 20px;
+            box-sizing: border-box;
+        }
+        #container {
+            background-color: #6a0dad; /* Roxo escuro */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         h1 {
             text-align: center;
+            margin-bottom: 20px;
         }
         #mensagem {
             margin-bottom: 20px;
             padding: 10px;
             background-color: #8a2be2; /* Roxo claro */
             border-radius: 5px;
-            text-align: center;
+        }
+        .mensagem-secao {
+            margin-bottom: 10px;
         }
         form {
             margin-bottom: 20px;
@@ -29,14 +46,17 @@
         input[type="text"],
         input[type="number"],
         button {
-            padding: 5px;
+            width: 100%;
+            padding: 10px;
             margin-bottom: 10px;
+            box-sizing: border-box;
         }
         button {
             background-color: #4CAF50; /* Verde */
             color: white;
             border: none;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         button:hover {
             background-color: #45a049; /* Verde mais escuro */
@@ -46,41 +66,67 @@
             padding: 0;
         }
         li {
-            padding: 5px;
-            margin-bottom: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
             border-radius: 5px;
+            background-color: #7a3fbe; /* Roxo médio */
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
         .produto-info {
             flex-grow: 1;
-            margin-left: 10px;
+        }
+        .remove-button {
+            background-color: #FF0000; /* Vermelho */
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
         #total {
             font-weight: bold;
+            text-align: center;
+        }
+        #qr-reader {
+            width: 100%;
+            margin-bottom: 20px;
         }
     </style>
+    <!-- Adicionando o script da biblioteca de leitura de QR Code -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
-    <h1>Sistema de Compras</h1>
-    <div id="mensagem">
-        <p>Olá pessoal,</p>
-        <p>Eu sou Maicon Paulo, estudante de Ciências da Computação, e desenvolvi este programa para ajudá-lo nas suas compras, permitindo que você saiba o valor que está gastando antes de chegar ao caixa. Espero que tenha gostado!</p>
-        <p>Até o momento, este programa está sendo oferecido gratuitamente. Boa sorte nas suas compras e obrigado por utilizar!</p>
+    <div id="container">
+        <h1>Sistema de Compras</h1>
+        <div id="mensagem">
+            <div class="mensagem-secao">
+                <p>Olá pessoal,</p>
+            </div>
+            <div class="mensagem-secao">
+                <p>Eu sou Maicon Paulo, estudante de Ciências da Computação, e desenvolvi este programa para ajudá-lo nas suas compras, permitindo que você saiba o valor que está gastando antes de chegar ao caixa. Espero que tenha gostado!</p>
+            </div>
+            <div class="mensagem-secao">
+                <p>Até o momento, este programa está sendo oferecido gratuitamente. Boa sorte nas suas compras e obrigado por utilizar!</p>
+            </div>
+        </div>
+        
+        <div id="qr-reader"></div>
+
+        <form>
+            <label for="produto">Produto:</label>
+            <input type="text" id="produto">
+            <label for="valor">Valor:</label>
+            <input type="number" id="valor">
+            <label for="quantidade">Quantidade:</label>
+            <input type="number" id="quantidade" value="1" min="1">
+            <button type="button" onclick="adicionarProduto()">Adicionar Produto</button><br>
+        </form>
+        
+        <ul id="listaProdutos"></ul>
+        <p id="total"></p>
     </div>
-    
-    <form>
-        <label for="produto">Produto:</label>
-        <input type="text" id="produto">
-        <label for="valor">Valor:</label>
-        <input type="number" id="valor">
-        <label for="quantidade">Quantidade:</label>
-        <input type="number" id="quantidade" value="1" min="1">
-        <button type="button" onclick="adicionarProduto()">Adicionar Produto</button><br>
-    </form>
-    
-    <ul id="listaProdutos"></ul>
-    <p id="total"></p>
 
     <script>
         let produtos = [];
@@ -89,14 +135,32 @@
             const produto = document.getElementById("produto").value;
             const valor = parseFloat(document.getElementById("valor").value);
             const quantidade = parseInt(document.getElementById("quantidade").value);
-            produtos.push({ nome: produto, valor: valor, quantidade: quantidade });
-            document.getElementById("listaProdutos").innerHTML += `<li><div class="produto-info">${produto} - R$ ${valor.toFixed(2)} - Quantidade: ${quantidade}</div></li>`;
+            const id = produtos.length;
+
+            produtos.push({ id: id, nome: produto, valor: valor, quantidade: quantidade });
+
+            const listaProdutos = document.getElementById("listaProdutos");
+            const li = document.createElement("li");
+            li.innerHTML = `<div class="produto-info">${produto} - R$ ${valor.toFixed(2)} - Quantidade: ${quantidade}</div><button class="remove-button" onclick="removerProduto(${id})">Remover</button>`;
+            li.setAttribute('data-id', id);
+            listaProdutos.appendChild(li);
+
             document.getElementById("produto").value = "";
             document.getElementById("valor").value = "";
             document.getElementById("quantidade").value = "1";
             calcularTotal();
         }
         
+        function removerProduto(id) {
+            produtos = produtos.filter(produto => produto.id !== id);
+            const listaProdutos = document.getElementById("listaProdutos");
+            const item = listaProdutos.querySelector(`li[data-id='${id}']`);
+            if (item) {
+                listaProdutos.removeChild(item);
+            }
+            calcularTotal();
+        }
+
         function calcularTotal() {
             let total = 0;
             let totalItens = 0;
@@ -106,6 +170,24 @@
             }
             document.getElementById("total").textContent = `Total: R$ ${total.toFixed(2)} (${totalItens} itens)`;
         }
+
+        // Função para iniciar o leitor de QR Code
+        function onScanSuccess(qrCodeMessage) {
+            // Assume que o QR Code contém os dados do produto no formato "produto,valor,quantidade"
+            const [produto, valor, quantidade] = qrCodeMessage.split(',');
+            document.getElementById("produto").value = produto;
+            document.getElementById("valor").value = valor;
+            document.getElementById("quantidade").value = quantidade;
+            adicionarProduto();
+        }
+
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        const qrCodeConfig = {
+            fps: 10, // Frames per second
+            qrbox: { width: 250, height: 250 }
+        };
+
+        html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onScanSuccess);
     </script>
 </body>
 </html>
