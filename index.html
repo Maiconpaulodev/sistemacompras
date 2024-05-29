@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Compras</title>
+    <style>
+        body {
+            background-color: purple;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #mensagem {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #8a2be2; /* Roxo claro */
+            border-radius: 5px;
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="number"],
+        button {
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50; /* Verde */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049; /* Verde mais escuro */
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .produto-info {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        #total {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Compras</h1>
+    <div id="mensagem">
+        <p>Olá pessoal,</p>
+        <p>Eu sou Maicon Paulo, estudante de Ciências da Computação, e desenvolvi este programa para ajudá-lo nas suas compras, permitindo que você saiba o valor que está gastando antes de chegar ao caixa. Espero que tenha gostado!</p>
+        <p>Até o momento, este programa está sendo oferecido gratuitamente. Boa sorte nas suas compras e obrigado por utilizar!</p>
+    </div>
+    
+    <form>
+        <label for="produto">Produto:</label>
+        <input type="text" id="produto">
+        <label for="valor">Valor:</label>
+        <input type="number" id="valor">
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" value="1" min="1">
+        <button type="button" onclick="adicionarProduto()">Adicionar Produto</button><br>
+    </form>
+    
+    <ul id="listaProdutos"></ul>
+    <p id="total"></p>
+
+    <script>
+        let produtos = [];
+        
+        function adicionarProduto() {
+            const produto = document.getElementById("produto").value;
+            const valor = parseFloat(document.getElementById("valor").value);
+            const quantidade = parseInt(document.getElementById("quantidade").value);
+            produtos.push({ nome: produto, valor: valor, quantidade: quantidade });
+            document.getElementById("listaProdutos").innerHTML += `<li><div class="produto-info">${produto} - R$ ${valor.toFixed(2)} - Quantidade: ${quantidade}</div></li>`;
+            document.getElementById("produto").value = "";
+            document.getElementById("valor").value = "";
+            document.getElementById("quantidade").value = "1";
+            calcularTotal();
+        }
+        
+        function calcularTotal() {
+            let total = 0;
+            let totalItens = 0;
+            for (let i = 0; i < produtos.length; i++) {
+                total += produtos[i].valor * produtos[i].quantidade;
+                totalItens += produtos[i].quantidade;
+            }
+            document.getElementById("total").textContent = `Total: R$ ${total.toFixed(2)} (${totalItens} itens)`;
+        }
+    </script>
+</body>
+</html>
