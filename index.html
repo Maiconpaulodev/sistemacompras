@@ -26,6 +26,13 @@
         h1 {
             text-align: center;
             margin-bottom: 20px;
+            cursor: pointer; /* Transforma o cursor em mãozinha ao passar sobre o título */
+        }
+        h1:hover {
+            text-decoration: underline; /* Sublinha o título ao passar sobre ele */
+        }
+        p {
+            text-align: center;
         }
         form {
             margin-bottom: 20px;
@@ -86,7 +93,8 @@
 </head>
 <body>
     <div id="container">
-        <h1>Sistema de Compras</h1>
+        <h1 onclick="alert('Compras em um Clique')">Sistema de Compras</h1>
+        <p>Compras em um Clique</p>
         
         <form>
             <label for="produto">Produto:</label>
