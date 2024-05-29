@@ -113,6 +113,7 @@
         </div>
         
         <div id="qr-reader"></div>
+        <div id="qr-reader-results"></div>
 
         <form>
             <label for="produto">Produto:</label>
@@ -173,7 +174,9 @@
 
         // Função para iniciar o leitor de QR Code
         function onScanSuccess(qrCodeMessage) {
-            // Assume que o QR Code contém os dados do produto no formato "produto,valor,quantidade"
+            const resultElement = document.getElementById('qr-reader-results');
+            resultElement.innerHTML = `<p>Produto escaneado: ${qrCodeMessage}</p>`;
+            
             const [produto, valor, quantidade] = qrCodeMessage.split(',');
             document.getElementById("produto").value = produto;
             document.getElementById("valor").value = valor;
