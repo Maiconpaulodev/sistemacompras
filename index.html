@@ -27,15 +27,6 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        #mensagem {
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #8a2be2; /* Roxo claro */
-            border-radius: 5px;
-        }
-        .mensagem-secao {
-            margin-bottom: 10px;
-        }
         form {
             margin-bottom: 20px;
         }
@@ -77,46 +68,26 @@
         .produto-info {
             flex-grow: 1;
         }
-        .remove-button {
+        .remove-button,
+        .edit-button {
             background-color: #FF0000; /* Vermelho */
             color: white;
             border: none;
             cursor: pointer;
             padding: 5px 10px;
             border-radius: 5px;
-            width: 80px; /* Tamanho fixo */
-    text-align: center;
-        }
-        #total {
-            font-weight: bold;
+            width: 70px; /* Tamanho fixo */
             text-align: center;
         }
-        #qr-reader {
-            width: 100%;
-            margin-bottom: 20px;
+        .edit-button {
+            margin-right: 5px; /* Espaçamento entre os botões */
         }
     </style>
-    <!-- Adicionando o script da biblioteca de leitura de QR Code -->
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
     <div id="container">
         <h1>Sistema de Compras</h1>
-        <div id="mensagem">
-            <div class="mensagem-secao">
-                <p>Olá pessoal,</p>
-            </div>
-            <div class="mensagem-secao">
-                <p>Eu sou Maicon Paulo, estudante de Ciências da Computação, e desenvolvi este programa para ajudá-lo nas suas compras, permitindo que você saiba o valor que está gastando antes de chegar ao caixa. Espero que tenha gostado!</p>
-            </div>
-            <div class="mensagem-secao">
-                <p>Até o momento, este programa está sendo oferecido gratuitamente. Boa sorte nas suas compras e obrigado por utilizar!</p>
-            </div>
-        </div>
         
-        <div id="qr-reader"></div>
-        <div id="qr-reader-results"></div>
-
         <form>
             <label for="produto">Produto:</label>
             <input type="text" id="produto">
@@ -124,7 +95,7 @@
             <input type="number" id="valor">
             <label for="quantidade">Quantidade:</label>
             <input type="number" id="quantidade" value="1" min="1">
-            <button type="button" onclick="adicionarProduto()">Adicionar Produto</button><br>
+            <button type="button" id="adicionar">Adicionar Produto</button><br>
         </form>
         
         <ul id="listaProdutos"></ul>
@@ -133,19 +104,20 @@
 
     <script>
         let produtos = [];
-        
+        let idCounter = 0;
+
         function adicionarProduto() {
             const produto = document.getElementById("produto").value;
             const valor = parseFloat(document.getElementById("valor").value);
             const quantidade = parseInt(document.getElementById("quantidade").value);
-            const id = produtos.length;
+            const id = idCounter++;
 
             produtos.push({ id: id, nome: produto, valor: valor, quantidade: quantidade });
 
             const listaProdutos = document.getElementById("listaProdutos");
             const li = document.createElement("li");
-            li.innerHTML = `<div class="produto-info">${produto} - R$ ${valor.toFixed(2)} - Quantidade: ${quantidade}</div><button class="remove-button" onclick="removerProduto(${id})">Remover</button>`;
             li.setAttribute('data-id', id);
+            li.innerHTML = `<div class="produto-info">${produto} - R$ ${valor.toFixed(2)} - Quantidade: ${quantidade}</div><button class="edit-button" onclick="editarProduto(${id})">Editar</button> <button class="remove-button" onclick="removerProduto(${id})">Remover</button>`;
             listaProdutos.appendChild(li);
 
             document.getElementById("produto").value = "";
@@ -154,6 +126,17 @@
             calcularTotal();
         }
         
+        function editarProduto(id) {
+            const produtoIndex = produtos.findIndex(p => p.id === id);
+            if (produtoIndex !== -1) {
+                const produto = produtos[produtoIndex];
+                document.getElementById("produto").value = produto.nome;
+                document.getElementById("valor").value = produto.valor;
+                document.getElementById("quantidade").value = produto.quantidade;
+                removerProduto(id);
+            }
+        }
+
         function removerProduto(id) {
             produtos = produtos.filter(produto => produto.id !== id);
             const listaProdutos = document.getElementById("listaProdutos");
@@ -174,25 +157,8 @@
             document.getElementById("total").textContent = `Total: R$ ${total.toFixed(2)} (${totalItens} itens)`;
         }
 
-        // Função para iniciar o leitor de QR Code
-        function onScanSuccess(qrCodeMessage) {
-            const resultElement = document.getElementById('qr-reader-results');
-            resultElement.innerHTML = `<p>Produto escaneado: ${qrCodeMessage}</p>`;
-            
-            const [produto, valor, quantidade] = qrCodeMessage.split(',');
-            document.getElementById("produto").value = produto;
-            document.getElementById("valor").value = valor;
-            document.getElementById("quantidade").value = quantidade;
-            adicionarProduto();
-        }
-
-        const html5QrCode = new Html5Qrcode("qr-reader");
-        const qrCodeConfig = {
-            fps: 10, // Frames per second
-            qrbox: { width: 250, height: 250 }
-        };
-
-        html5QrCode.start({ facingMode: "environment" }, qrCodeConfig, onScanSuccess);
+        document.getElementById("adicionar").addEventListener("click", adicionarProduto);
     </script>
 </body>
 </html>
+
